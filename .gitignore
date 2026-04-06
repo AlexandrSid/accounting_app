@@ -1,1 +1,4 @@
-/.coursor
+.cursor/
+/configure-agents.md
+/HOOKS.md
+/README.md
