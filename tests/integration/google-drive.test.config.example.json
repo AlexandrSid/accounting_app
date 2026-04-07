@@ -1,0 +1,9 @@
+{
+  "googleClientId": "your-google-oauth-client-id.apps.googleusercontent.com",
+  "googleClientSecret": "your-google-oauth-client-secret",
+  "googleRefreshToken": "your-google-refresh-token",
+  "driveFolderId": "your-google-main-drive-folder-id",
+  "mainDriveFolderId": "your-google-main-drive-folder-id",
+  "mirrorDriveFolderId": "your-google-mirror-drive-folder-id",
+  "testSpreadsheetTitle": "Accounting App Integration Test Sheet"
+}

@@ -1,4 +1,10 @@
 .cursor/
+runtime/
 /configure-agents.md
 /HOOKS.md
 /README.md
+userconfig.yml
+userconfig*.yml
+/test notes.txt
+/tests/integration/google-drive.test.config*.json
+!/tests/integration/google-drive.test.config.example.json
