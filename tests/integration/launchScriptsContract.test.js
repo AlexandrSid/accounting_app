@@ -233,34 +233,35 @@ test("index.html noscript block contains localhost:10800 URL", () => {
 });
 
 // ---------------------------------------------------------------------------
-// index.html — preload-notice inline script
+// index.html — default static shell inside #app
 // ---------------------------------------------------------------------------
 
-test("index.html contains the preload-notice inline script", () => {
+test("index.html static shell mentions launch scripts and localhost port", () => {
   const src = fs.readFileSync(INDEX_HTML_PATH, { encoding: "utf8" });
-  assert.ok(src.includes("preload-notice"), "index.html must contain the preload-notice element");
+  const mainStart = src.indexOf('<main id="app">');
+  const mainEnd = src.indexOf("</main>", mainStart);
+  assert.ok(mainStart !== -1, 'index.html must contain <main id="app">');
+  assert.ok(mainEnd !== -1, "index.html <main> must be closed");
+
+  const mainBlock = src.slice(mainStart, mainEnd);
+  assert.ok(mainBlock.includes("launch.bat"));
+  assert.ok(mainBlock.includes("launch.command"));
+  assert.ok(mainBlock.includes("launch.sh"));
+  assert.ok(mainBlock.includes("localhost:10800"));
+  assert.ok(mainBlock.includes("nodejs.org"));
 });
 
-test("index.html preload-notice script injects a paragraph into the body", () => {
+test("index.html static shell documents folder prep and OAuth Test users", () => {
   const src = fs.readFileSync(INDEX_HTML_PATH, { encoding: "utf8" });
-  assert.ok(
-    src.includes("createElement"),
-    "preload-notice script must use createElement to build the notice element"
-  );
-  assert.ok(
-    src.includes("document.body.prepend"),
-    "preload-notice script must prepend the notice to the body"
-  );
+  assert.ok(src.includes("primary"));
+  assert.ok(src.includes("mirror"));
+  assert.ok(src.includes("Editor"));
+  assert.ok(src.includes("operator"));
+  assert.ok(src.includes("Test users"));
 });
 
-test("index.html preload-notice script removes itself once app content loads", () => {
+test("index.html does not inject preload-notice or Loading MutationObserver bridge", () => {
   const src = fs.readFileSync(INDEX_HTML_PATH, { encoding: "utf8" });
-  assert.ok(
-    src.includes("MutationObserver"),
-    "preload-notice script must use MutationObserver to auto-remove the notice"
-  );
-  assert.ok(
-    src.includes("el.remove()"),
-    "preload-notice script must remove the notice element when app renders"
-  );
+  assert.equal(src.includes("preload-notice"), false);
+  assert.equal(src.includes("MutationObserver"), false);
 });

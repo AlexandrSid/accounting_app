@@ -8,3 +8,4 @@ userconfig*.yml
 /test notes.txt
 /tests/integration/google-drive.test.config*.json
 !/tests/integration/google-drive.test.config.example.json
+ai_docs/

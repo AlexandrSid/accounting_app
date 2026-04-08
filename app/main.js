@@ -24,6 +24,7 @@ const appState = {
   currentPage: "workspace"
 };
 const GOOGLE_CLIENT_ID_PLACEHOLDER = "REPLACE_WITH_GOOGLE_OAUTH_CLIENT_ID";
+const BOOT_LOADING_MESSAGE = "Loading application configuration…";
 
 boot().catch((error) => {
   const technicalMessage = toTechnicalErrorMessage(error);
@@ -37,6 +38,8 @@ async function boot() {
     renderLocalhostGuard();
     return;
   }
+
+  appRoot.innerHTML = `<section class="card"><p class="status" id="boot-status">${BOOT_LOADING_MESSAGE}</p></section>`;
 
   appState.applicationConfig = await loadApplicationConfig();
   appState.locale = appState.applicationConfig.defaultLocale;

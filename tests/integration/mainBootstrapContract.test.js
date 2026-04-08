@@ -43,6 +43,21 @@ test("boot guards file protocol and renders localhost guidance", () => {
   assert.ok(source.includes("10800"));
 });
 
+test("boot shows configuration loading message before fetch on http", () => {
+  const source = readMainSource();
+  assert.ok(source.includes("BOOT_LOADING_MESSAGE"));
+  assert.ok(source.includes("Loading application configuration"));
+  const bootIdx = source.indexOf("async function boot()");
+  assert.ok(bootIdx !== -1);
+  const httpGateEnd = source.indexOf("appRoot.innerHTML", bootIdx);
+  const loadConfigIdx = source.indexOf("await loadApplicationConfig()", bootIdx);
+  assert.ok(httpGateEnd !== -1 && loadConfigIdx !== -1);
+  assert.ok(
+    httpGateEnd < loadConfigIdx,
+    "boot must set appRoot loading markup before await loadApplicationConfig"
+  );
+});
+
 test("wizard no longer asks for googleClientId manually", () => {
   const source = readMainSource();
 
