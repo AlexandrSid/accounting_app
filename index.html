@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Accounting App</title>
+    <link rel="stylesheet" href="./app/styles/main.css" />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </head>
+  <body>
+    <noscript>
+      <h2>How to launch Accounting App</h2>
+      <p>This app requires JavaScript and a local server. Open a terminal in the project folder and run:</p>
+      <ul>
+        <li><strong>Windows:</strong> <code>launch.bat</code></li>
+        <li><strong>macOS:</strong> <code>launch.command</code></li>
+        <li><strong>Linux:</strong> <code>./launch.sh</code></li>
+      </ul>
+      <p>Then open <a href="http://localhost:10800">http://localhost:10800</a> in your browser.</p>
+      <p>No Node.js? Download it at <a href="https://nodejs.org/">nodejs.org</a>.</p>
+    </noscript>
+    <main id="app">
+      <section class="card" id="static-shell">
+        <h1>Accounting App</h1>
+        <h2>Launch</h2>
+        <p>
+          Run a local static server from the project folder (Node.js required), then open the app in your
+          browser:
+        </p>
+        <ul>
+          <li><strong>Windows:</strong> <code>launch.bat</code></li>
+          <li><strong>macOS:</strong> <code>launch.command</code></li>
+          <li><strong>Linux:</strong> <code>./launch.sh</code></li>
+        </ul>
+        <p>URL: <a href="http://localhost:10800">http://localhost:10800</a></p>
+        <p>Install Node.js from <a href="https://nodejs.org/">nodejs.org</a> if needed.</p>
+        <h2>Before first setup</h2>
+        <p>
+          Create <strong>two</strong> Google Drive folders: a <strong>primary</strong> folder and a
+          <strong>mirror</strong> folder. Share <strong>both</strong> with your
+          <strong>operator</strong> Google account using the <strong>Editor</strong> role. The setup
+          wizard will ask for the share links to these folders and the operator email.
+        </p>
+      </section>
+    </main>
+    <script type="module" src="./app/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "wizardTitle": "Мастер начальной конфигурации",
+  "wizardDescription": "Укажите ссылки на папки, email оператора, выполните авторизацию Google и создайте userconfig.yml.",
+  "languageLabel": "Язык",
+  "primaryFolderUrl": "Ссылка на primary папку",
+  "mirrorFolderUrl": "Ссылка на mirror папку",
+  "operatorEmail": "Email operator account",
+  "googleClientId": "Google OAuth Client ID",
+  "authorizeGoogle": "Авторизовать Google",
+  "initialize": "Инициализировать",
+  "authorizationOk": "Авторизация завершена.",
+  "authorizationRequired": "Перед инициализацией выполните авторизацию Google.",
+  "configExists": "Файл userconfig.yml найден. Можно переходить к бизнес-логике.",
+  "configMissing": "Файл userconfig.yml не найден. Завершите мастер настройки.",
+  "saveSuccessFs": "userconfig.yml сохранен через File System Access API.",
+  "saveFallbackDownload": "Прямое сохранение недоступно. Скачайте userconfig.yml и положите рядом с index.html.",
+  "saveFallbackManual": "Ручной режим: создайте userconfig.yml рядом с index.html и вставьте содержимое ниже.",
+  "wizard.folderInconsistency.heading": "Обнаружена несогласованность папок",
+  "wizard.folderInconsistency.message": "В основной или зеркальной папке найдено более одной таблицы с именем \"{title}\". Откройте Google Диск и вручную удалите дубликаты, оставив не более одного файла в каждой папке.",
+  "wizard.folderInconsistency.retry": "Повторить"
+}

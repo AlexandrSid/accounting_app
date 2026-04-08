@@ -1,0 +1,7 @@
+financialYearStart: "04-01"
+defaultLocale: "en"
+availableCurrencies: "USD,EUR,RUB,RSD,HUL,IKS"
+usedCurrencies: "EUR"
+activeSpreadsheetTitle: "active_period_operations"
+googleClientId: "713943232076-cmuv8v7md52f654r900q0vbdikh4b4f3.apps.googleusercontent.com"
+testConsoleEnabled: "true"

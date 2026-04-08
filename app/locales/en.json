@@ -1,0 +1,21 @@
+{
+  "wizardTitle": "Initial configuration wizard",
+  "wizardDescription": "Set folder links, operator email, authorize Google, then generate userconfig.yml.",
+  "languageLabel": "Language",
+  "primaryFolderUrl": "Primary folder URL",
+  "mirrorFolderUrl": "Mirror folder URL",
+  "operatorEmail": "Operator account email",
+  "googleClientId": "Google OAuth Client ID",
+  "authorizeGoogle": "Authorize Google",
+  "initialize": "Initialize",
+  "authorizationOk": "Authorization completed.",
+  "authorizationRequired": "Authorize Google before initialization.",
+  "configExists": "userconfig.yml was found. You can continue with business logic.",
+  "configMissing": "userconfig.yml was not found. Complete setup wizard.",
+  "saveSuccessFs": "userconfig.yml was saved via File System Access API.",
+  "saveFallbackDownload": "Direct save is not available. Download userconfig.yml and place it near index.html.",
+  "saveFallbackManual": "Manual fallback: create userconfig.yml near index.html and paste the content below.",
+  "wizard.folderInconsistency.heading": "Folder Inconsistency Detected",
+  "wizard.folderInconsistency.message": "More than one spreadsheet named \"{title}\" was found in the primary or mirror folder. Please open Google Drive and manually remove the duplicate files, keeping at most one in each folder.",
+  "wizard.folderInconsistency.retry": "Retry"
+}
