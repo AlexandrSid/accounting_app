@@ -15,6 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const MAIN_JS_PATH = path.resolve(__dirname, "../../app/main.js");
 const MAIN_CSS_PATH = path.resolve(__dirname, "../../app/styles/main.css");
+const FILE_SERVICE_JS_PATH = path.resolve(__dirname, "../../app/services/fileService.js");
 
 function readMainSource() {
   return fs.readFileSync(MAIN_JS_PATH, "utf8");
@@ -22,6 +23,10 @@ function readMainSource() {
 
 function readMainStyles() {
   return fs.readFileSync(MAIN_CSS_PATH, "utf8");
+}
+
+function readFileServiceSource() {
+  return fs.readFileSync(FILE_SERVICE_JS_PATH, "utf8");
 }
 
 test("boot guards file protocol and renders localhost guidance", () => {
@@ -108,4 +113,47 @@ test("stack-form CSS class is defined in main.css", () => {
 
   assert.match(styles, /\.stack-form\s*\{/);
   assert.match(styles, /display:\s*grid;/);
+});
+
+test("fileService exports pickUserConfigSaveHandle and writeYamlToFileHandle", () => {
+  const source = readFileServiceSource();
+
+  assert.ok(
+    source.includes("pickUserConfigSaveHandle"),
+    "fileService.js must export pickUserConfigSaveHandle"
+  );
+  assert.ok(
+    source.includes("writeYamlToFileHandle"),
+    "fileService.js must export writeYamlToFileHandle"
+  );
+});
+
+test("main.js imports pickUserConfigSaveHandle and writeYamlToFileHandle from fileService", () => {
+  const source = readMainSource();
+
+  assert.ok(
+    source.includes("pickUserConfigSaveHandle"),
+    'main.js must import pickUserConfigSaveHandle from fileService'
+  );
+  assert.ok(
+    source.includes("writeYamlToFileHandle"),
+    'main.js must import writeYamlToFileHandle from fileService'
+  );
+  assert.ok(
+    source.includes("./services/fileService"),
+    'main.js must import from ./services/fileService'
+  );
+});
+
+test("main.js wizard setup tracks mirrorSpreadsheetId and calls setupSpreadsheetSheets for both folders", () => {
+  const source = readMainSource();
+
+  assert.ok(
+    source.includes("mirrorSpreadsheetId"),
+    'main.js must contain mirrorSpreadsheetId'
+  );
+  assert.ok(
+    (source.match(/setupSpreadsheetSheets/g) || []).length >= 2,
+    'main.js must call setupSpreadsheetSheets at least twice (primary and mirror branches)'
+  );
 });

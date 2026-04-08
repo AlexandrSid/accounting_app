@@ -40,6 +40,7 @@ node --test tests/integration/launchScriptsContract.test.js
 |------|---------|
 | `googleDriveCreateFileFlow.test.js` | Create & cleanup spreadsheets in both main/mirror folders |
 | `googleDriveEditFileFlow.test.js` | Edit & verify metadata updates |
+| `googleDriveTestConfig.test.js` | Google Drive test config loading & validation |
 | `mainBootstrapContract.test.js` | Main application bootstrap & config loading |
 | `userConfigContract.test.js` | User configuration file contract validation |
 | `testConsoleContract.test.js` | Test Console tab when `testConsoleEnabled: "true"` |

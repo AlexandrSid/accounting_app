@@ -1,9 +1,10 @@
 import { requestAccessToken, getStoredAccessToken } from "./services/authService.js";
 import { extractFolderId, loadApplicationConfig, loadUserConfigIfExists } from "./services/configService.js";
-import { saveUserConfigFile } from "./services/fileService.js";
+import { pickUserConfigSaveHandle, saveUserConfigFile, writeYamlToFileHandle } from "./services/fileService.js";
 import {
   appendRow,
   createSpreadsheetInFolder,
+  listSpreadsheetsByTitle,
   readRange,
   setInitialSheetHeaders,
   setupSpreadsheetSheets,
@@ -144,28 +145,71 @@ function renderWizard() {
       return;
     }
 
-    const formData = new FormData(form);
-    const primaryFolderUrl = String(formData.get("primaryFolderUrl") || "").trim();
-    const mirrorFolderUrl = String(formData.get("mirrorFolderUrl") || "").trim();
-    const operatorEmail = String(formData.get("operatorEmail") || "").trim();
-    const googleClientId = getEffectiveClientId();
-
     try {
+      // Step 1 — pick save location before any Drive calls
+      let saveHandle = null;
+      if (typeof window.showSaveFilePicker === "function") {
+        try {
+          saveHandle = await pickUserConfigSaveHandle();
+        } catch (err) {
+          if (err.name === "AbortError") {
+            setStatus("File save cancelled. Please try again and choose a save location.", true);
+            return;
+          }
+          throw err;
+        }
+      }
+
+      // Step 2 — parse form + verify folders
+      const formData = new FormData(form);
+      const primaryFolderUrl = String(formData.get("primaryFolderUrl") || "").trim();
+      const mirrorFolderUrl = String(formData.get("mirrorFolderUrl") || "").trim();
+      const operatorEmail = String(formData.get("operatorEmail") || "").trim();
+      const googleClientId = getEffectiveClientId();
+      const token = appState.accessToken;
+
       setStatus("Verifying folder access...");
       const primaryFolderId = extractFolderId(primaryFolderUrl);
       const mirrorFolderId = extractFolderId(mirrorFolderUrl);
-      await verifyFolderAccess(primaryFolderId, appState.accessToken);
-      await verifyFolderAccess(mirrorFolderId, appState.accessToken);
+      await verifyFolderAccess(primaryFolderId, token);
+      await verifyFolderAccess(mirrorFolderId, token);
 
+      // Step 3 — folder consistency check
+      const activeSpreadsheetTitle = appState.applicationConfig.activeSpreadsheetTitle;
+      const [primaryMatches, mirrorMatches] = await Promise.all([
+        listSpreadsheetsByTitle(activeSpreadsheetTitle, primaryFolderId, token),
+        listSpreadsheetsByTitle(activeSpreadsheetTitle, mirrorFolderId, token)
+      ]);
+
+      if (primaryMatches.length > 1 || mirrorMatches.length > 1) {
+        renderFolderInconsistencyError();
+        return;
+      }
+
+      // Step 4 — ensure spreadsheet in PRIMARY and MIRROR
       setStatus("Creating spreadsheet and sheets...");
-      const spreadsheet = await createSpreadsheetInFolder(
-        appState.applicationConfig.activeSpreadsheetTitle,
-        primaryFolderId,
-        appState.accessToken
-      );
-      await setupSpreadsheetSheets(spreadsheet.id, appState.accessToken);
-      await setInitialSheetHeaders(spreadsheet.id, appState.accessToken);
 
+      let activeSpreadsheetId;
+      if (primaryMatches.length === 0) {
+        const spreadsheet = await createSpreadsheetInFolder(activeSpreadsheetTitle, primaryFolderId, token);
+        await setupSpreadsheetSheets(spreadsheet.id, token);
+        await setInitialSheetHeaders(spreadsheet.id, token);
+        activeSpreadsheetId = spreadsheet.id;
+      } else {
+        activeSpreadsheetId = primaryMatches[0].id;
+      }
+
+      let mirrorSpreadsheetId;
+      if (mirrorMatches.length === 0) {
+        const mirrorSpreadsheet = await createSpreadsheetInFolder(activeSpreadsheetTitle, mirrorFolderId, token);
+        await setupSpreadsheetSheets(mirrorSpreadsheet.id, token);
+        await setInitialSheetHeaders(mirrorSpreadsheet.id, token);
+        mirrorSpreadsheetId = mirrorSpreadsheet.id;
+      } else {
+        mirrorSpreadsheetId = mirrorMatches[0].id;
+      }
+
+      // Step 5 — build userConfig
       const userConfig = {
         primaryFolderUrl,
         mirrorFolderUrl,
@@ -173,21 +217,27 @@ function renderWizard() {
         mirrorFolderId,
         operatorEmail,
         googleClientId,
-        activeSpreadsheetId: spreadsheet.id,
+        activeSpreadsheetId,
+        mirrorSpreadsheetId,
         activeSpreadsheetTitle: appState.applicationConfig.activeSpreadsheetTitle,
         locale: appState.locale,
         createdAtUtc: new Date().toISOString()
       };
 
+      // Step 6 — write YAML
       const yamlContent = toFlatYaml(userConfig);
-      document.getElementById("yaml-preview").textContent = yamlContent;
-      const saveMethod = await saveUserConfigFile(yamlContent);
-      if (saveMethod === "filesystem") {
+      const el = document.getElementById("yaml-preview");
+      if (el) el.textContent = yamlContent;
+
+      if (saveHandle) {
+        await writeYamlToFileHandle(saveHandle, yamlContent);
         setStatus(t("saveSuccessFs"));
       } else {
+        saveUserConfigFile(yamlContent);
         setStatus(t("saveFallbackDownload"));
       }
 
+      // Step 7 — finish
       appState.userConfig = userConfig;
       renderBusinessPlaceholder();
     } catch (error) {
@@ -283,6 +333,29 @@ function renderBusinessPlaceholder() {
       console.error("Append demo transaction failed:", error);
       output.textContent = "Unable to append demo transaction right now. Check console for details.";
     }
+  });
+}
+
+function renderFolderInconsistencyError() {
+  const heading = t("wizard.folderInconsistency.heading");
+  const message = t("wizard.folderInconsistency.message").replace(
+    "{title}",
+    appState.applicationConfig.activeSpreadsheetTitle
+  );
+  const retryLabel = t("wizard.folderInconsistency.retry");
+
+  appRoot.innerHTML = `
+    <section class="card">
+      <h1>${escapeHtml(heading)}</h1>
+      <p>${escapeHtml(message)}</p>
+      <div class="actions">
+        <button id="retry-wizard-btn">${escapeHtml(retryLabel)}</button>
+      </div>
+    </section>
+  `;
+
+  document.getElementById("retry-wizard-btn").addEventListener("click", () => {
+    renderWizard();
   });
 }
 
